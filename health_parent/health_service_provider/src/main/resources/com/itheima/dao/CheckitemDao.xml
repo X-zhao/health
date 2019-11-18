@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.itheima.dao.CheckitemDao">
+
+    <select id="testItem" parameterType="int" resultType="checkitem">
+        select * from t_checkitem where id in (select checkitem_id from t_checkgroup_checkitem where checkgroup_id = #{checkgroup_id})
+    </select>
+
+    <insert id="add" parameterType="com.itheima.pojo.CheckItem">
+       insert into t_checkitem (code,name,sex,age,type,price,remark,attention) values(#{code},#{name},#{sex},#{age},#{type},#{price},#{remark},#{attention})
+    </insert>
+
+    <select id="findIteamByIid" parameterType="int" resultType="checkItem">
+        select * from t_checkitem where id = #{id}
+    </select>
+
+    <select id="findIteamIdsByGid" parameterType="int" resultType="int">
+        select checkitem_id from t_checkgroup_checkitem where checkgroup_id = #{id}
+    </select>
+
+    <select id="pageQuery" parameterType="string" resultType="com.itheima.pojo.CheckItem">
+        select * from t_checkitem
+        <where>
+            <if test="value!=null and value.length>0">
+                code like #{value} or name like #{value}
+            </if>
+        </where>
+    </select>
+
+    <delete id="delById" parameterType="int">
+        delete from t_checkitem where id = #{id}
+    </delete>
+
+    <update id="updata" parameterType="com.itheima.pojo.CheckItem">
+        update t_checkitem set code = #{code},name =#{name},sex=#{sex},age=#{age},price=#{price},type=#{type},attention=#{attention},remark=#{remark} where id =#{id}
+    </update>
+
+    <select id="findCountByCheckItemId" resultType="long">
+        select count(*) from t_checkgroup_checkitem where checkitem_id = #{id}
+    </select>
+
+</mapper>

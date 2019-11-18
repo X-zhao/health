@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <script src="https://unpkg.com/vue/dist/vue.js"></script>
+    <!-- 引入ElementUI组件库 -->
+    <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+    <script src="js/axios-0.18.0.js"></script>
+
+</head>
+<body>
+<div id="app">
+    <template>
+        <el-table :data="tableData" stripe style="width: 100%" >
+            <el-table-column prop="id" label="id" width="180"></el-table-column>
+            <el-table-column prop="name" label="姓名" width="180"></el-table-column>
+        </el-table>
+    </template>
+<!--    <button onclick="fun1" >按钮</button>-->
+<!--    <div v-on:mouseover="fun1" ></div>-->
+    <script>
+        new Vue({
+            el: "#app",
+            data: {
+                tableData: [{
+                    id: '2016-05-02',
+                    name: '王小虎',
+                    address: '上海市普陀区金沙江路 1518 弄'
+                }]
+            },
+            /*methods: {
+                fun1: function () {
+                    alter(1234);
+                        axios.get('/user/list')
+                        .then(function(response){
+                            tableData=response
+                        })
+                        .catch(function(err){console.log(err);});
+                    //以上请求也可以通过这种方式来发送axios.get('/user',{params:{ID:12345}
+                }
+            }*/
+            created(){
+               /* _this = this;
+                axios.get('/user/list.do')
+                    .then(function(respons){
+                        _this.tableData=respons.data;
+                    })
+                    .catch(function(err){console.log(err);});*/
+
+                axios.get('/user/list.do').then((response) => {
+                    this.tableData = response.data;
+                });
+
+                //以上请求也可以通过这种方式来发送axios.get('/user',{params:{ID:12345}
+            }
+        })
+
+    </script>
+
+</div>
+</body>
+</html>

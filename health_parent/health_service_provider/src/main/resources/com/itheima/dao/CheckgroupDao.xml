@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.itheima.dao.CheckgroupDao">
+
+    <resultMap id="beanGroup" type="com.itheima.pojo.CheckGroup" autoMapping="true">
+        <id column="id" property="id"></id>
+    </resultMap>
+    <resultMap id="groupMap" type="com.itheima.pojo.CheckGroup">
+        <collection property="checkItems"
+                    ofType="com.itheima.pojo.CheckItem"
+                    column="id"
+                    select="com.itheima.dao.CheckitemDao.testItem"
+        ></collection>
+    </resultMap>
+
+    <select id="grouptest" parameterType="int" resultMap="groupMap">
+        select * from t_checkgroup where id in (select checkgroup_id from t_setmeal_checkgroup where setmeal_id = #{setmeal_id})
+    </select>
+
+    <resultMap id="checkGroupMap" type="checkGroup">
+        <id column="t_cg.id" property="id" ></id>
+        <result column="t_cg.code" property="code"></result>
+        <result column="t_cg.name" property="name"></result>
+        <result column="t_cg.helpCode" property="helpCode"></result>
+        <result column="t_cg.sex" property="sex"></result>
+        <result column="t_cg.remark" property="remark"></result>
+        <result column="t_cg.attention" property="attention"></result>
+        <association property="super" javaType="checkItem">
+            <id column="t_ci.id" property="id"></id>
+            <result column="t_ci.code" property="code"></result>
+            <result column="t_ci.name" property="name"></result>
+            <result column="t_ci.sex" property="sex"></result>
+            <result column="t_ci.age" property="age"></result>
+            <result column="t_ci.price" property="price"></result>
+            <result column="t_ci.type" property="type"></result>
+            <result column="t_ci.remark" property="remark"></result>
+            <result column="t_ci.attention" property="attention"></result>
+        </association>
+
+    </resultMap>
+
+    <select id="pageQuery2" parameterType="string" resultMap="checkGroupMap">
+        SELECT t_cg.id, t_cg.code, t_cg.name, t_cg.helpCode, t_cg.sex, t_cg.remark, t_cg.attention,
+        tcc.checkgroup_id, checkitem_id,
+        t_ci.id, t_ci.code, t_ci.name, t_ci.sex, t_ci.age, t_ci.price, t_ci.type, t_ci.attention, t_ci.remark
+        FROM (SELECT * FROM t_checkgroup ) t_cg
+        LEFT JOIN t_checkgroup_checkitem tcc ON t_cg.id = tcc.checkgroup_id
+        LEFT JOIN t_checkitem t_ci ON tcc.checkitem_id = t_ci.id
+        <where>
+            <if test="value != null and value.length >0">
+                t_cg.code like #{value} or t_cg.name like #{value} or t_cg.helpCode like #{value}
+            </if>
+        </where>
+    </select>
+
+    <select id="findGroupById" parameterType="int" resultType="checkGroup">
+        select * from t_checkgroup where id=#{id}
+    </select>
+
+    <select id="find_tccById" parameterType="int" resultType="int">
+        select checkitem_id  from  t_checkgroup_checkitem where checkgroup_id =#{id}
+    </select>
+
+    <select id="findGroupIdsBySid" parameterType="int" resultType="int">
+        select checkgroup_id from t_setmeal_checkgroup where setmeal_id =#{sid}
+    </select>
+
+    <select id="pageQuery" parameterType="string" resultType="checkGroup">
+        select * from t_checkgroup
+        <where>
+            <if test="value != null and value.length > 0">
+                name like #{value} or code like #{value} or helpCode like #{value}
+            </if>
+        </where>
+    </select>
+
+    <insert id="addCheckGroup" parameterType="com.itheima.pojo.CheckItem">
+        <selectKey resultType="int" order="AFTER" keyProperty="id">
+            select last_insert_id();
+        </selectKey>
+        insert into t_checkgroup (code,name,helpCode,sex,remark,attention)
+        values(#{code},#{name},#{helpCode},#{sex},#{remark},#{attention})
+    </insert>
+
+    <insert id="addCheckgroup_checkitem" parameterType="map">
+        insert into t_checkgroup_checkitem values (#{cgid},#{checkitemId});
+    </insert>
+
+    <delete id="delete_tcc" parameterType="int">
+        delete from t_checkgroup_checkitem where checkgroup_id = #{id}
+    </delete>
+
+    <delete id="delete_tcg" parameterType="int">
+        delete  from t_checkgroup where id = #{id}
+    </delete>
+
+    <update id="updata_tcg" parameterType="checkGroup" >
+        update t_checkgroup set code =#{code},name =#{name},helpCode=#{helpCode},sex=#{sex},remark=#{remark},attention=#{attention}
+            where id = #{id}
+    </update>
+
+</mapper>
