@@ -4,17 +4,19 @@ import com.alibaba.dubbo.config.annotation.Service;
 import com.github.pagehelper.PageHelper;
 import com.itheima.dao.CheckgroupDao;
 import com.itheima.dao.CheckitemDao;
+import com.itheima.dao.OrderDao;
 import com.itheima.dao.SetmealDao;
 import com.itheima.entity.QueryPageBean;
 import com.itheima.pojo.CheckGroup;
 import com.itheima.pojo.CheckItem;
 import com.itheima.pojo.Setmeal;
 import com.itheima.service.SetmealService;
-import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service(interfaceClass = SetmealService.class)
 public class SetmealServiceImpl implements SetmealService {
@@ -24,6 +26,8 @@ public class SetmealServiceImpl implements SetmealService {
     private CheckgroupDao checkgroupDao;
     @Autowired
     private CheckitemDao checkitemDao;
+    @Autowired
+    private OrderDao orderDao;
     @Override
     public void add(Setmeal setmeal, Integer[] checkgroupIds) {
         setmealDao.addSetmeal(setmeal);
@@ -82,5 +86,37 @@ public class SetmealServiceImpl implements SetmealService {
         setmeal.setCheckGroups(checkGroups);
         return setmeal;
 
+    }
+
+    @Override
+    public Map getSetmealReport() {
+        //data: res.data.data.setmealNames
+        HashMap<String, Object> data = new HashMap<>();
+        List<Setmeal> list = setmealDao.findByQuery(null);
+        List<String> setmealNames = new ArrayList<>();
+        List<Map> setmealCount= new ArrayList<>();
+
+        for (Setmeal setmeal : list) {
+            setmealNames.add(setmeal.getName());
+            int count = orderDao.findOrderCountBySetmealId(setmeal.getId());
+            HashMap<String, Object> hashMap = new HashMap<>();
+            hashMap.put("value",count);
+            hashMap.put("name",setmeal.getName());
+            setmealCount.add(hashMap);
+        }
+        data.put("setmealNames",setmealNames);
+        data.put("setmealCount",setmealCount);
+        //data:res.data.data.setmealCount,
+            /*
+            [
+                {value:335, name:'直接访问'},
+                {value:310, name:'邮件营销'},
+                {value:274, name:'联盟广告'},
+                {value:235, name:'视频广告'},
+                {value:400, name:'搜索引擎'}
+            ].sort(function (a, b) { return a.value - b.value; }),
+             */
+
+        return data;
     }
 }

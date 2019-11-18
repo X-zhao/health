@@ -81,4 +81,8 @@
           group by o.setmeal_id
           order by setmeal_count desc limit 0,4
     </select>
+
+    <select id="findOrderCountBySetmealId" resultType="java.lang.Integer" parameterType="int">
+        select count(id) from t_order where setmeal_id = #{setmeal_id}
+    </select>
 </mapper>

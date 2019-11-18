@@ -5,6 +5,7 @@ import com.itheima.entity.QueryPageBean;
 import com.itheima.pojo.Setmeal;
 
 import java.util.List;
+import java.util.Map;
 
 
 public interface SetmealService {
@@ -19,4 +20,6 @@ public interface SetmealService {
     Setmeal findSetmealById(Integer id);
 
     Setmeal findOneById(Integer id);
+
+    Map getSetmealReport();
 }
